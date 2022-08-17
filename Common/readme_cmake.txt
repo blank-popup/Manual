@@ -1,0 +1,1 @@
+sudo sh ./cmake-3.20.0-linux-x86_64.shsudo mv cmake-3.20.0-linux-x86_64 /opt/cmakesudo ln -s /opt/cmake/bin/* /usr/bin/ 
