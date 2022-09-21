@@ -1,0 +1,91 @@
+sudo vi /etc/ssh/sshd_config
+------------------
+...
+#Port 22
+...
+------------------
+...
+#Port 22
+Port 10001
+------------------
+
+sudo vi /etc/hosts.allow
+------------------
+...
+#
+
+------------------
+...
+#
+sshd: 192.168.
+
+------------------
+
+sudo vi /etc/hosts.deny
+------------------
+...
+# ALL: PARANOID
+
+------------------
+...
+# ALL: PARANOID
+sshd: ALL
+
+------------------
+
+sudo ufw allow from 192.168.0.0/16 to any port 10001
+
+sudo apt install postgresql postgresql-contrib
+sudo vi /etc/postgresql/14/main/postgresql.conf
+------------------
+...
+#listen_addresses = 'localhost'         # what IP address(es) to listen on;
+                                        # comma-separated list of addresses;
+                                        # defaults to 'localhost'; use '*' for all
+                                        # (change requires restart)
+port = 5432                             # (change requires restart)
+max_connections = 100                   # (change requires restart)
+...
+------------------
+...
+#listen_addresses = 'localhost'         # what IP address(es) to listen on;
+                                        # comma-separated list of addresses;
+                                        # defaults to 'localhost'; use '*' for all
+listen_addresses = '*'
+                                        # (change requires restart)
+#port = 5432                            # (change requires restart)
+port = 10008
+max_connections = 100                   # (change requires restart)
+...
+------------------
+sudo vi /etc/postgresql/14/main/pg_hba.conf
+------------------
+...
+# IPv4 local connections:
+host    all             all             127.0.0.1/32            scram-sha-256
+...
+------------------
+...
+# IPv4 local connections:
+#host    all             all             127.0.0.1/32            scram-sha-256
+host    all             all             192.168.0.0/16          scram-sha-256
+...
+------------------
+sudo systemctl restart postgresql
+sudo ufw allow from 192.168.0.0/16 to any port 10008
+sudo ufw reload
+
+psql --version
+sudo -i -u postgres
+psql
+postgres=# create user novagre password '0000' superuser;
+
+
+
+>>> import psycopg2
+>>> db = psycopg2.connect(host='192.168.200.183', dbname='novadb', user='novagre', password='0000', port=10008)
+>>> cur = db.cursor()
+>>> cur.execute('SELECT * from doe_user')
+>>> result = cur.fetchall()
+>>> result
+[(1, 'doe', 'john doe', datetime.time(5, 5, 5, tzinfo=datetime.timezone(datetime.timedelta(seconds=32400))))]
