@@ -1,0 +1,14 @@
+### http http://127.0.0.1:8000/snippets/
+
+### DJango snippets API in 01_snippets.txt
+GET http://192.168.200.195:10003/snippets/ HTTP/1.1
+Accept: application/json; indent=4
+
+### DJango snippets API in 01_snippets.txt
+GET http://192.168.200.195:10003/snippets/3 HTTP/1.1
+Accept: application/json; indent=4
+
+
+### DJango snippets API in 01_snippets.txt
+GET http://192.168.200.195:10003/admin HTTP/1.1
+Accept: application/json; indent=4

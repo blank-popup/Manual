@@ -1,0 +1,373 @@
+(jango) nova@raspberry:~/WorkSpace/MMjango/MMjango$ django-admin startapp snippets
+$$$$$ EDIT MMjango/settings.py : ADD
+    ==================
+    INSTALLED_APPS = [
+        'django.contrib.admin',
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+        'django.contrib.sessions',
+        'django.contrib.messages',
+        'django.contrib.staticfiles',
+    ]
+    ==================
+    INSTALLED_APPS = [
+        'django.contrib.admin',
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+        'django.contrib.sessions',
+        'django.contrib.messages',
+        'django.contrib.staticfiles',
+        'rest_framework',
+        'snippets',
+    ]
+    ==================
+$$$$$ EDIT MMjango/snippets/models.py : EDIT
+    ==================
+    from django.db import models
+
+    # Create your models here.
+    ==================
+    from django.db import models
+    from pygments.lexers import get_all_lexers
+    from pygments.styles import get_all_styles
+
+    LEXERS = [item for item in get_all_lexers() if item[1]]
+    LANGUAGE_CHOICES = sorted([(item[1][0], item[0]) for item in LEXERS])
+    STYLE_CHOICES = sorted([(item, item) for item in get_all_styles()])
+
+
+    class Snippet(models.Model):
+        created = models.DateTimeField(auto_now_add=True)
+        title = models.CharField(max_length=100, blank=True, default='')
+        code = models.TextField()
+        linenos = models.BooleanField(default=False)
+        language = models.CharField(choices=LANGUAGE_CHOICES, default='python', max_length=100)
+        style = models.CharField(choices=STYLE_CHOICES, default='friendly', max_length=100)
+
+        class Meta:
+            ordering = ['created']
+    ==================
+(jango) nova@raspberry:~/WorkSpace/MMjango$ python manage.py makemigrations snippets
+Traceback (most recent call last):
+  File "/home/nova/WorkSpace/MMjango/manage.py", line 22, in <module>
+    main()
+  File "/home/nova/WorkSpace/MMjango/manage.py", line 18, in main
+    execute_from_command_line(sys.argv)
+  File "/home/nova/miniforge3/envs/jango/lib/python3.10/site-packages/django/core/management/__init__.py", line 446, in execute_from_command_line
+    utility.execute()
+  File "/home/nova/miniforge3/envs/jango/lib/python3.10/site-packages/django/core/management/__init__.py", line 420, in execute
+    django.setup()
+  File "/home/nova/miniforge3/envs/jango/lib/python3.10/site-packages/django/__init__.py", line 24, in setup
+    apps.populate(settings.INSTALLED_APPS)
+  File "/home/nova/miniforge3/envs/jango/lib/python3.10/site-packages/django/apps/registry.py", line 91, in populate
+    app_config = AppConfig.create(entry)
+  File "/home/nova/miniforge3/envs/jango/lib/python3.10/site-packages/django/apps/config.py", line 193, in create
+    import_module(entry)
+  File "/home/nova/miniforge3/envs/jango/lib/python3.10/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1050, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1027, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1004, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'snippets'
+$$$$$ EDIT MMjango/settings.py : EDIT
+    ==================
+        'snippets',
+    ==================
+        'MMjango.snippets',
+    ==================
+(jango) nova@raspberry:~/WorkSpace/MMjango$ python manage.py makemigrations snippets
+Traceback (most recent call last):
+  File "/home/nova/miniforge3/envs/jango/lib/python3.10/site-packages/django/apps/config.py", line 210, in create
+    app_module = import_module(app_name)
+  File "/home/nova/miniforge3/envs/jango/lib/python3.10/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1050, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1027, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1004, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'snippets'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/nova/WorkSpace/MMjango/manage.py", line 22, in <module>
+    main()
+  File "/home/nova/WorkSpace/MMjango/manage.py", line 18, in main
+    execute_from_command_line(sys.argv)
+  File "/home/nova/miniforge3/envs/jango/lib/python3.10/site-packages/django/core/management/__init__.py", line 446, in execute_from_command_line
+    utility.execute()
+  File "/home/nova/miniforge3/envs/jango/lib/python3.10/site-packages/django/core/management/__init__.py", line 420, in execute
+    django.setup()
+  File "/home/nova/miniforge3/envs/jango/lib/python3.10/site-packages/django/__init__.py", line 24, in setup
+    apps.populate(settings.INSTALLED_APPS)
+  File "/home/nova/miniforge3/envs/jango/lib/python3.10/site-packages/django/apps/registry.py", line 91, in populate
+    app_config = AppConfig.create(entry)
+  File "/home/nova/miniforge3/envs/jango/lib/python3.10/site-packages/django/apps/config.py", line 212, in create
+    raise ImproperlyConfigured(
+django.core.exceptions.ImproperlyConfigured: Cannot import 'snippets'. Check that 'MMjango.snippets.apps.SnippetsConfig.name' is correct.
+$$$$$ EDIT MMjango/snippets/apps.py : EDIT
+    ==================
+        name = 'snippets'
+    ==================
+        name = 'MMjango.snippets'
+    ==================
+(jango) nova@raspberry:~/WorkSpace/MMjango$ python manage.py makemigrations snippets
+Migrations for 'snippets':
+  MMjango/snippets/migrations/0001_initial.py
+    - Create model Snippet
+(jango) nova@raspberry:~/WorkSpace/MMjango$ python manage.py migrate snippets
+Operations to perform:
+  Apply all migrations: snippets
+Running migrations:
+  Applying snippets.0001_initial... OK
+$$$$$ CREATE MMjango/snippets/serializers.py
+    ==================
+    from rest_framework import serializers
+    from snippets.models import Snippet, LANGUAGE_CHOICES, STYLE_CHOICES
+
+
+    class SnippetSerializer(serializers.Serializer):
+        id = serializers.IntegerField(read_only=True)
+        title = serializers.CharField(required=False, allow_blank=True, max_length=100)
+        code = serializers.CharField(style={'base_template': 'textarea.html'})
+        linenos = serializers.BooleanField(required=False)
+        language = serializers.ChoiceField(choices=LANGUAGE_CHOICES, default='python')
+        style = serializers.ChoiceField(choices=STYLE_CHOICES, default='friendly')
+
+        def create(self, validated_data):
+            """
+            Create and return a new `Snippet` instance, given the validated data.
+            """
+            return Snippet.objects.create(**validated_data)
+
+        def update(self, instance, validated_data):
+            """
+            Update and return an existing `Snippet` instance, given the validated data.
+            """
+            instance.title = validated_data.get('title', instance.title)
+            instance.code = validated_data.get('code', instance.code)
+            instance.linenos = validated_data.get('linenos', instance.linenos)
+            instance.language = validated_data.get('language', instance.language)
+            instance.style = validated_data.get('style', instance.style)
+            instance.save()
+            return instance
+    ==================
+(jango) nova@raspberry:~/WorkSpace/MMjango$ python manage.py shell
+$$$$$ INPUT FOLLOWINGS
+    ==================
+    from MMjango.snippets.models import Snippet
+    from MMjango.snippets.serializers import SnippetSerializer
+    from rest_framework.renderers import JSONRenderer
+    from rest_framework.parsers import JSONParser
+
+    snippet = Snippet(code='foo = "bar"\n')
+    snippet.save()
+
+    snippet = Snippet(code='print("hello, world")\n')
+    snippet.save()
+
+    serializer = SnippetSerializer(snippet)
+    serializer.data
+
+    content = JSONRenderer().render(serializer.data)
+    content
+
+    import io
+
+    stream = io.BytesIO(content)
+    data = JSONParser().parse(stream)
+    data
+
+    serializer = SnippetSerializer(data=data)
+    serializer.is_valid()
+    serializer.validated_data
+    serializer.save()
+
+    serializer = SnippetSerializer(Snippet.objects.all(), many=True)
+    serializer.data
+    ==================
+Python 3.10.6 | packaged by conda-forge | (main, Aug 22 2022, 20:36:39) [GCC 10.4.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+(InteractiveConsole)
+>>> from MMjango.snippets.models import Snippet
+>>> from MMjango.snippets.serializers import SnippetSerializer
+Traceback (most recent call last):
+  File "<console>", line 1, in <module>
+  File "/home/nova/WorkSpace/MMjango/MMjango/snippets/serializers.py", line 2, in <module>
+    from snippets.models import Snippet, LANGUAGE_CHOICES, STYLE_CHOICES
+ModuleNotFoundError: No module named 'snippets'
+$$$$$ EDIT MMjango/snippets/serializers.py : EDIT
+    ==================
+    from snippets.models import Snippet, LANGUAGE_CHOICES, STYLE_CHOICES
+    ==================
+    from MMjango.snippets.models import Snippet, LANGUAGE_CHOICES, STYLE_CHOICES
+    ==================
+>>> from MMjango.snippets.serializers import SnippetSerializer
+>>> from rest_framework.renderers import JSONRenderer
+>>> from rest_framework.parsers import JSONParser
+>>> snippet = Snippet(code='foo = "bar"\n')
+>>> snippet.save()
+>>> snippet = Snippet(code='print("hello, world")\n')
+>>> snippet.save()
+>>> serializer = SnippetSerializer(snippet)
+>>> serializer.data
+{'id': 4, 'title': '', 'code': 'print("hello, world")\n', 'linenos': False, 'language': 'python', 'style': 'friendly'}
+>>> content = JSONRenderer().render(serializer.data)
+>>> content
+b'{"id":4,"title":"","code":"print(\\"hello, world\\")\\n","linenos":false,"language":"python","style":"friendly"}'
+>>> import io
+>>> stream = io.BytesIO(content)
+>>> data = JSONParser().parse(stream)
+>>> data
+{'id': 4, 'title': '', 'code': 'print("hello, world")\n', 'linenos': False, 'language': 'python', 'style': 'friendly'}
+>>> serializer = SnippetSerializer(data=data)
+>>> serializer.is_valid()
+True
+.save()
+>>> serializer.validated_data
+OrderedDict([('title', ''), ('code', 'print("hello, world")'), ('linenos', False), ('language', 'python'), ('style', 'friendly')])
+>>> serializer.save()
+<Snippet: Snippet object (5)>
+>>> serializer = SnippetSerializer(Snippet.objects.all(), many=True)
+>>> serializer.data
+[OrderedDict([('id', 1), ('title', ''), ('code', 'foo = "bar"\n'), ('linenos', False), ('language', 'python'), ('style', 'friendly')]), OrderedDict([('id', 2), ('title', ''), ('code', 'print("hello, world")\n'), ('linenos', False), ('language', 'python'), ('style', 'friendly')]), OrderedDict([('id', 3), ('title', ''), ('code', 'foo = "bar"\n'), ('linenos', False), ('language', 'python'), ('style', 'friendly')]), OrderedDict([('id', 4), ('title', ''), ('code', 'print("hello, world")\n'), ('linenos', False), ('language', 'python'), ('style', 'friendly')]), OrderedDict([('id', 5), ('title', ''), ('code', 'print("hello, world")'), ('linenos', False), ('language', 'python'), ('style', 'friendly')])]
+>>> exit()
+$$$$$ EDIT MMjango/snippets/serializers.py : EDIT
+    ==================
+    class SnippetSerializer(serializers.Serializer):
+        id = serializers.IntegerField(read_only=True)
+        title = serializers.CharField(required=False, allow_blank=True, max_length=100)
+        code = serializers.CharField(style={'base_template': 'textarea.html'})
+        linenos = serializers.BooleanField(required=False)
+        language = serializers.ChoiceField(choices=LANGUAGE_CHOICES, default='python')
+        style = serializers.ChoiceField(choices=STYLE_CHOICES, default='friendly')
+
+        def create(self, validated_data):
+            """
+            Create and return a new `Snippet` instance, given the validated data.
+            """
+            return Snippet.objects.create(**validated_data)
+
+        def update(self, instance, validated_data):
+            """
+            Update and return an existing `Snippet` instance, given the validated data.
+            """
+            instance.title = validated_data.get('title', instance.title)
+            instance.code = validated_data.get('code', instance.code)
+            instance.linenos = validated_data.get('linenos', instance.linenos)
+            instance.language = validated_data.get('language', instance.language)
+            instance.style = validated_data.get('style', instance.style)
+            instance.save()
+            return instance
+    ==================
+    class SnippetSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = Snippet
+            fields = ['id', 'title', 'code', 'linenoss', 'language', 'style']
+    ==================
+(jango) nova@raspberry:~/WorkSpace/MMjango$ python manage.py shell
+$$$$$ INPUT FOLLOWINGS
+    ==================
+    from MMjango.snippets.serializers import SnippetSerializer
+    serializer = SnippetSerializer()
+    print(repr(serializer))
+    ==================
+Python 3.10.6 | packaged by conda-forge | (main, Aug 22 2022, 20:36:39) [GCC 10.4.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+(InteractiveConsole)
+>>> from MMjango.snippets.serializers import SnippetSerializer
+>>> serializer = SnippetSerializer()
+>>> print(repr(serializer))
+SnippetSerializer():
+    id = IntegerField(label='ID', read_only=True)
+    title = CharField(allow_blank=True, max_length=100, required=False)
+    code = CharField(style={'base_template': 'textarea.html'})
+    linenos = BooleanField(required=False)
+    language = ChoiceField(choices=[('abap', 'ABAP'), ('abnf', 'ABNF'), ('actionscript', 'ActionScript'), ('actionscript3', 'ActionScript 3'), ('ada', 'Ada'), ('adl', 'ADL'), ('agda', 'Agda'), ('aheui', 'Aheui'), ('alloy', 'Alloy'), ('ambienttalk', 'AmbientTalk'), ('amdgpu', 'AMDGPU'), ('ampl', 'Ampl'), ('ansys', 'ANSYS parametric design language'), ('antlr', 'ANTLR'), ('antlr-actionscript', 'ANTLR With ActionScript Target'), ('antlr-cpp', 'ANTLR With CPP Target'), ('antlr-csharp', 'ANTLR With C# Target'), ('antlr-java', 'ANTLR With Java Target'), ('antlr-objc', 'ANTLR With ObjectiveC Target'), ('antlr-perl', 'ANTLR With Perl Target'), ('antlr-python', 'ANTLR With Python Target'), ('antlr-ruby', 'ANTLR With Ruby Target'), ('apacheconf', 'ApacheConf'), ('apl', 'APL'), ('applescript', 'AppleScript'), ('arduino', 'Arduino'), ('arrow', 'Arrow'), ('asc', 'ASCII armored'), ('aspectj', 'AspectJ'), ('aspx-cs', 'aspx-cs'), ('aspx-vb', 'aspx-vb'), ('asymptote', 'Asymptote'), ('augeas', 'Augeas'), ('autohotkey', 'autohotkey'), ('autoit', 'AutoIt'), ('awk', 'Awk'), ('bare', 'BARE'), ('basemake', 'Base Makefile'), ('bash', 'Bash'), ('batch', 'Batchfile'), ('bbcbasic', 'BBC Basic'), ('bbcode', 'BBCode'), ('bc', 'BC'), ('bdd', 'Bdd'), ('befunge', 'Befunge'), ('berry', 'Berry'), ('bibtex', 'BibTeX'), ('blitzbasic', 'BlitzBasic'), ('blitzmax', 'BlitzMax'), ('bnf', 'BNF'), ('boa', 'Boa'), ('boo', 'Boo'), ('boogie', 'Boogie'), ('brainfuck', 'Brainfuck'), ('bst', 'BST'), ('bugs', 'BUGS'), ('c', 'C'), ('c-objdump', 'c-objdump'), ('ca65', 'ca65 assembler'), ('cadl', 'cADL'), ('camkes', 'CAmkES'), ('capdl', 'CapDL'), ('capnp', "Cap'n Proto"), ('cbmbas', 'CBM BASIC V2'), ('cddl', 'CDDL'), ('ceylon', 'Ceylon'), ('cfc', 'Coldfusion CFC'), ('cfengine3', 'CFEngine3'), ('cfm', 'Coldfusion HTML'), ('cfs', 'cfstatement'), ('chaiscript', 'ChaiScript'), ('chapel', 'Chapel'), ('charmci', 'Charmci'), ('cheetah', 'Cheetah'), ('cirru', 'Cirru'), ('clay', 'Clay'), ('clean', 'Clean'), ('clojure', 'Clojure'), ('clojurescript', 'ClojureScript'), ('cmake', 'CMake'), ('cobol', 'COBOL'), ('cobolfree', 'COBOLFree'), ('coffeescript', 'CoffeeScript'), ('comal', 'COMAL-80'), ('common-lisp', 'Common Lisp'), ('componentpascal', 'Component Pascal'), ('console', 'Bash Session'), ('coq', 'Coq'), ('cplint', 'cplint'), ('cpp', 'C++'), ('cpp-objdump', 'cpp-objdump'), ('cpsa', 'CPSA'), ('cr', 'Crystal'), ('crmsh', 'Crmsh'), ('croc', 'Croc'), ('cryptol', 'Cryptol'), ('csharp', 'C#'), ('csound', 'Csound Orchestra'), ('csound-document', 'Csound Document'), ('csound-score', 'Csound Score'), ('css', 'CSS'), ('css+django', 'CSS+Django/Jinja'), ('css+genshitext', 'CSS+Genshi Text'), ('css+lasso', 'CSS+Lasso'), ('css+mako', 'CSS+Mako'), ('css+mozpreproc', 'CSS+mozpreproc'), ('css+myghty', 'CSS+Myghty'), ('css+php', 'CSS+PHP'), ('css+ruby', 'CSS+Ruby'), ('css+smarty', 'CSS+Smarty'), ('css+ul4', 'CSS+UL4'), ('cuda', 'CUDA'), ('cypher', 'Cypher'), ('cython', 'Cython'), ('d', 'D'), ('d-objdump', 'd-objdump'), ('dart', 'Dart'), ('dasm16', 'DASM16'), ('debcontrol', 'Debian Control file'), ('debsources', 'Debian Sourcelist'), ('delphi', 'Delphi'), ('devicetree', 'Devicetree'), ('dg', 'dg'), ('diff', 'Diff'), ('django', 'Django/Jinja'), ('docker', 'Docker'), ('doscon', 'MSDOS Session'), ('dpatch', 'Darcs Patch'), ('dtd', 'DTD'), ('duel', 'Duel'), ('dylan', 'Dylan'), ('dylan-console', 'Dylan session'), ('dylan-lid', 'DylanLID'), ('earl-grey', 'Earl Grey'), ('easytrieve', 'Easytrieve'), ('ebnf', 'EBNF'), ('ec', 'eC'), ('ecl', 'ECL'), ('eiffel', 'Eiffel'), ('elixir', 'Elixir'), ('elm', 'Elm'), ('elpi', 'Elpi'), ('emacs-lisp', 'EmacsLisp'), ('email', 'E-mail'), ('erb', 'ERB'), ('erl', 'Erlang erl session'), ('erlang', 'Erlang'), ('evoque', 'Evoque'), ('execline', 'execline'), ('extempore', 'xtlang'), ('ezhil', 'Ezhil'), ('factor', 'Factor'), ('fan', 'Fantom'), ('fancy', 'Fancy'), ('felix', 'Felix'), ('fennel', 'Fennel'), ('fish', 'Fish'), ('flatline', 'Flatline'), ('floscript', 'FloScript'), ('forth', 'Forth'), ('fortran', 'Fortran'), ('fortranfixed', 'FortranFixed'), ('foxpro', 'FoxPro'), ('freefem', 'Freefem'), ('fsharp', 'F#'), ('fstar', 'FStar'), ('futhark', 'Futhark'), ('gap', 'GAP'), ('gas', 'GAS'), ('gcode', 'g-code'), ('gdscript', 'GDScript'), ('genshi', 'Genshi'), ('genshitext', 'Genshi Text'), ('gherkin', 'Gherkin'), ('glsl', 'GLSL'), ('gnuplot', 'Gnuplot'), ('go', 'Go'), ('golo', 'Golo'), ('gooddata-cl', 'GoodData-CL'), ('gosu', 'Gosu'), ('graphviz', 'Graphviz'), ('groff', 'Groff'), ('groovy', 'Groovy'), ('gsql', 'GSQL'), ('gst', 'Gosu Template'), ('haml', 'Haml'), ('handlebars', 'Handlebars'), ('haskell', 'Haskell'), ('haxe', 'Haxe'), ('haxeml', 'Hxml'), ('hexdump', 'Hexdump'), ('hlsl', 'HLSL'), ('hsail', 'HSAIL'), ('hspec', 'Hspec'), ('html', 'HTML'), ('html+cheetah', 'HTML+Cheetah'), ('html+django', 'HTML+Django/Jinja'), ('html+evoque', 'HTML+Evoque'), ('html+genshi', 'HTML+Genshi'), ('html+handlebars', 'HTML+Handlebars'), ('html+lasso', 'HTML+Lasso'), ('html+mako', 'HTML+Mako'), ('html+myghty', 'HTML+Myghty'), ('html+ng2', 'HTML + Angular2'), ('html+php', 'HTML+PHP'), ('html+smarty', 'HTML+Smarty'), ('html+twig', 'HTML+Twig'), ('html+ul4', 'HTML+UL4'), ('html+velocity', 'HTML+Velocity'), ('http', 'HTTP'), ('hybris', 'Hybris'), ('hylang', 'Hy'), ('i6t', 'Inform 6 template'), ('icon', 'Icon'), ('idl', 'IDL'), ('idris', 'Idris'), ('iex', 'Elixir iex session'), ('igor', 'Igor'), ('inform6', 'Inform 6'), ('inform7', 'Inform 7'), ('ini', 'INI'), ('io', 'Io'), ('ioke', 'Ioke'), ('irc', 'IRC logs'), ('isabelle', 'Isabelle'), ('j', 'J'), ('jags', 'JAGS'), ('jasmin', 'Jasmin'), ('java', 'Java'), ('javascript', 'JavaScript'), ('javascript+cheetah', 'JavaScript+Cheetah'), ('javascript+django', 'JavaScript+Django/Jinja'), ('javascript+lasso', 'JavaScript+Lasso'), ('javascript+mako', 'JavaScript+Mako'), ('javascript+mozpreproc', 'Javascript+mozpreproc'), ('javascript+myghty', 'JavaScript+Myghty'), ('javascript+php', 'JavaScript+PHP'), ('javascript+ruby', 'JavaScript+Ruby'), ('javascript+smarty', 'JavaScript+Smarty'), ('jcl', 'JCL'), ('jlcon', 'Julia console'), ('jmespath', 'JMESPath'), ('js+genshitext', 'JavaScript+Genshi Text'), ('js+ul4', 'Javascript+UL4'), ('jsgf', 'JSGF'), ('jslt', 'JSLT'), ('json', 'JSON'), ('jsonld', 'JSON-LD'), ('jsp', 'Java Server Page'), ('julia', 'Julia'), ('juttle', 'Juttle'), ('k', 'K'), ('kal', 'Kal'), ('kconfig', 'Kconfig'), ('kmsg', 'Kernel log'), ('koka', 'Koka'), ('kotlin', 'Kotlin'), ('kuin', 'Kuin'), ('lasso', 'Lasso'), ('lean', 'Lean'), ('less', 'LessCss'), ('lighttpd', 'Lighttpd configuration file'), ('lilypond', 'LilyPond'), ('limbo', 'Limbo'), ('liquid', 'liquid'), ('literate-agda', 'Literate Agda'), ('literate-cryptol', 'Literate Cryptol'), ('literate-haskell', 'Literate Haskell'), ('literate-idris', 'Literate Idris'), ('livescript', 'LiveScript'), ('llvm', 'LLVM'), ('llvm-mir', 'LLVM-MIR'), ('llvm-mir-body', 'LLVM-MIR Body'), ('logos', 'Logos'), ('logtalk', 'Logtalk'), ('lsl', 'LSL'), ('lua', 'Lua'), ('macaulay2', 'Macaulay2'), ('make', 'Makefile'), ('mako', 'Mako'), ('maql', 'MAQL'), ('markdown', 'Markdown'), ('mask', 'Mask'), ('mason', 'Mason'), ('mathematica', 'Mathematica'), ('matlab', 'Matlab'), ('matlabsession', 'Matlab session'), ('maxima', 'Maxima'), ('mcfunction', 'MCFunction'), ('meson', 'Meson'), ('mime', 'MIME'), ('minid', 'MiniD'), ('miniscript', 'MiniScript'), ('modelica', 'Modelica'), ('modula2', 'Modula-2'), ('monkey', 'Monkey'), ('monte', 'Monte'), ('moocode', 'MOOCode'), ('moonscript', 'MoonScript'), ('mosel', 'Mosel'), ('mozhashpreproc', 'mozhashpreproc'), ('mozpercentpreproc', 'mozpercentpreproc'), ('mql', 'MQL'), ('mscgen', 'Mscgen'), ('mupad', 'MuPAD'), ('mxml', 'MXML'), ('myghty', 'Myghty'), ('mysql', 'MySQL'), ('nasm', 'NASM'), ('ncl', 'NCL'), ('nemerle', 'Nemerle'), ('nesc', 'nesC'), ('nestedtext', 'NestedText'), ('newlisp', 'NewLisp'), ('newspeak', 'Newspeak'), ('ng2', 'Angular2'), ('nginx', 'Nginx configuration file'), ('nimrod', 'Nimrod'), ('nit', 'Nit'), ('nixos', 'Nix'), ('nodejsrepl', 'Node.js REPL console session'), ('notmuch', 'Notmuch'), ('nsis', 'NSIS'), ('numpy', 'NumPy'), ('nusmv', 'NuSMV'), ('objdump', 'objdump'), ('objdump-nasm', 'objdump-nasm'), ('objective-c', 'Objective-C'), ('objective-c++', 'Objective-C++'), ('objective-j', 'Objective-J'), ('ocaml', 'OCaml'), ('octave', 'Octave'), ('odin', 'ODIN'), ('omg-idl', 'OMG Interface Definition Language'), ('ooc', 'Ooc'), ('opa', 'Opa'), ('openedge', 'OpenEdge ABL'), ('output', 'Text output'), ('pacmanconf', 'PacmanConf'), ('pan', 'Pan'), ('parasail', 'ParaSail'), ('pawn', 'Pawn'), ('peg', 'PEG'), ('perl', 'Perl'), ('perl6', 'Perl6'), ('php', 'PHP'), ('pig', 'Pig'), ('pike', 'Pike'), ('pkgconfig', 'PkgConfig'), ('plpgsql', 'PL/pgSQL'), ('pointless', 'Pointless'), ('pony', 'Pony'), ('postgresql', 'PostgreSQL SQL dialect'), ('postscript', 'PostScript'), ('pot', 'Gettext Catalog'), ('pov', 'POVRay'), ('powershell', 'PowerShell'), ('praat', 'Praat'), ('procfile', 'Procfile'), ('prolog', 'Prolog'), ('promql', 'PromQL'), ('properties', 'Properties'), ('protobuf', 'Protocol Buffer'), ('psql', 'PostgreSQL console (psql)'), ('psysh', 'PsySH console session for PHP'), ('pug', 'Pug'), ('puppet', 'Puppet'), ('pwsh-session', 'PowerShell Session'), ('py+ul4', 'Python+UL4'), ('py2tb', 'Python 2.x Traceback'), ('pycon', 'Python console session'), ('pypylog', 'PyPy Log'), ('pytb', 'Python Traceback'), ('python', 'Python'), ('python2', 'Python 2.x'), ('q', 'Q'), ('qbasic', 'QBasic'), ('qlik', 'Qlik'), ('qml', 'QML'), ('qvto', 'QVTO'), ('racket', 'Racket'), ('ragel', 'Ragel'), ('ragel-c', 'Ragel in C Host'), ('ragel-cpp', 'Ragel in CPP Host'), ('ragel-d', 'Ragel in D Host'), ('ragel-em', 'Embedded Ragel'), ('ragel-java', 'Ragel in Java Host'), ('ragel-objc', 'Ragel in Objective C Host'), ('ragel-ruby', 'Ragel in Ruby Host'), ('rbcon', 'Ruby irb session'), ('rconsole', 'RConsole'), ('rd', 'Rd'), ('reasonml', 'ReasonML'), ('rebol', 'REBOL'), ('red', 'Red'), ('redcode', 'Redcode'), ('registry', 'reg'), ('resourcebundle', 'ResourceBundle'), ('restructuredtext', 'reStructuredText'), ('rexx', 'Rexx'), ('rhtml', 'RHTML'), ('ride', 'Ride'), ('rita', 'Rita'), ('rng-compact', 'Relax-NG Compact'), ('roboconf-graph', 'Roboconf Graph'), ('roboconf-instances', 'Roboconf Instances'), ('robotframework', 'RobotFramework'), ('rql', 'RQL'), ('rsl', 'RSL'), ('ruby', 'Ruby'), ('rust', 'Rust'), ('sarl', 'SARL'), ('sas', 'SAS'), ('sass', 'Sass'), ('savi', 'Savi'), ('scala', 'Scala'), ('scaml', 'Scaml'), ('scdoc', 'scdoc'), ('scheme', 'Scheme'), ('scilab', 'Scilab'), ('scss', 'SCSS'), ('sed', 'Sed'), ('sgf', 'SmartGameFormat'), ('shen', 'Shen'), ('shexc', 'ShExC'), ('sieve', 'Sieve'), ('silver', 'Silver'), ('singularity', 'Singularity'), ('slash', 'Slash'), ('slim', 'Slim'), ('slurm', 'Slurm'), ('smali', 'Smali'), ('smalltalk', 'Smalltalk'), ('smarty', 'Smarty'), ('smithy', 'Smithy'), ('sml', 'Standard ML'), ('snbt', 'SNBT'), ('snobol', 'Snobol'), ('snowball', 'Snowball'), ('solidity', 'Solidity'), ('sophia', 'Sophia'), ('sp', 'SourcePawn'), ('sparql', 'SPARQL'), ('spec', 'RPMSpec'), ('spice', 'Spice'), ('splus', 'S'), ('sql', 'SQL'), ('sql+jinja', 'SQL+Jinja'), ('sqlite3', 'sqlite3con'), ('squidconf', 'SquidConf'), ('srcinfo', 'Srcinfo'), ('ssp', 'Scalate Server Page'), ('stan', 'Stan'), ('stata', 'Stata'), ('supercollider', 'SuperCollider'), ('swift', 'Swift'), ('swig', 'SWIG'), ('systemverilog', 'systemverilog'), ('tads3', 'TADS 3'), ('tal', 'Tal'), ('tap', 'TAP'), ('tasm', 'TASM'), ('tcl', 'Tcl'), ('tcsh', 'Tcsh'), ('tcshcon', 'Tcsh Session'), ('tea', 'Tea'), ('teal', 'teal'), ('teratermmacro', 'Tera Term macro'), ('termcap', 'Termcap'), ('terminfo', 'Terminfo'), ('terraform', 'Terraform'), ('tex', 'TeX'), ('text', 'Text only'), ('thrift', 'Thrift'), ('ti', 'ThingsDB'), ('tid', 'tiddler'), ('tnt', 'Typographic Number Theory'), ('todotxt', 'Todotxt'), ('toml', 'TOML'), ('trac-wiki', 'MoinMoin/Trac Wiki markup'), ('trafficscript', 'TrafficScript'), ('treetop', 'Treetop'), ('tsql', 'Transact-SQL'), ('turtle', 'Turtle'), ('twig', 'Twig'), ('typescript', 'TypeScript'), ('typoscript', 'TypoScript'), ('typoscriptcssdata', 'TypoScriptCssData'), ('typoscripthtmldata', 'TypoScriptHtmlData'), ('ucode', 'ucode'), ('ul4', 'UL4'), ('unicon', 'Unicon'), ('unixconfig', 'Unix/Linux config files'), ('urbiscript', 'UrbiScript'), ('usd', 'USD'), ('vala', 'Vala'), ('vb.net', 'VB.net'), ('vbscript', 'VBScript'), ('vcl', 'VCL'), ('vclsnippets', 'VCLSnippets'), ('vctreestatus', 'VCTreeStatus'), ('velocity', 'Velocity'), ('verilog', 'verilog'), ('vgl', 'VGL'), ('vhdl', 'vhdl'), ('vim', 'VimL'), ('wast', 'WebAssembly'), ('wdiff', 'WDiff'), ('webidl', 'Web IDL'), ('whiley', 'Whiley'), ('x10', 'X10'), ('xml', 'XML'), ('xml+cheetah', 'XML+Cheetah'), ('xml+django', 'XML+Django/Jinja'), ('xml+evoque', 'XML+Evoque'), ('xml+lasso', 'XML+Lasso'), ('xml+mako', 'XML+Mako'), ('xml+myghty', 'XML+Myghty'), ('xml+php', 'XML+PHP'), ('xml+ruby', 'XML+Ruby'), ('xml+smarty', 'XML+Smarty'), ('xml+ul4', 'XML+UL4'), ('xml+velocity', 'XML+Velocity'), ('xorg.conf', 'Xorg'), ('xquery', 'XQuery'), ('xslt', 'XSLT'), ('xtend', 'Xtend'), ('xul+mozpreproc', 'XUL+mozpreproc'), ('yaml', 'YAML'), ('yaml+jinja', 'YAML+Jinja'), ('yang', 'YANG'), ('zeek', 'Zeek'), ('zephir', 'Zephir'), ('zig', 'Zig')], required=False)
+    style = ChoiceField(choices=[('abap', 'abap'), ('algol', 'algol'), ('algol_nu', 'algol_nu'), ('arduino', 'arduino'), ('autumn', 'autumn'), ('borland', 'borland'), ('bw', 'bw'), ('colorful', 'colorful'), ('default', 'default'), ('dracula', 'dracula'), ('emacs', 'emacs'), ('friendly', 'friendly'), ('friendly_grayscale', 'friendly_grayscale'), ('fruity', 'fruity'), ('github-dark', 'github-dark'), ('gruvbox-dark', 'gruvbox-dark'), ('gruvbox-light', 'gruvbox-light'), ('igor', 'igor'), ('inkpot', 'inkpot'), ('lilypond', 'lilypond'), ('lovelace', 'lovelace'), ('manni', 'manni'), ('material', 'material'), ('monokai', 'monokai'), ('murphy', 'murphy'), ('native', 'native'), ('nord', 'nord'), ('nord-darker', 'nord-darker'), ('one-dark', 'one-dark'), ('paraiso-dark', 'paraiso-dark'), ('paraiso-light', 'paraiso-light'), ('pastie', 'pastie'), ('perldoc', 'perldoc'), ('rainbow_dash', 'rainbow_dash'), ('rrt', 'rrt'), ('sas', 'sas'), ('solarized-dark', 'solarized-dark'), ('solarized-light', 'solarized-light'), ('staroffice', 'staroffice'), ('stata', 'stata'), ('stata-dark', 'stata-dark'), ('stata-light', 'stata-light'), ('tango', 'tango'), ('trac', 'trac'), ('vim', 'vim'), ('vs', 'vs'), ('xcode', 'xcode'), ('zenburn', 'zenburn')], required=False)
+>>> exit()
+$$$$$ EDIT MMjango/snippets/views.py : EDIT
+    ==================
+    from django.shortcuts import render
+
+    # Create your views here.
+    ==================
+    from django.http import HttpResponse, JsonResponse
+    from django.views.decorators.csrf import csrf_exempt
+    from rest_framework.parsers import JSONParser
+    from MMjango.snippets.models import Snippet
+    from MMjango.snippets.serializers import SnippetSerializer
+
+
+    @csrf_exempt
+    def snippet_list(request):
+        """
+        List all code snippets, or create a new snippet.
+        """
+        if request.method == 'GET':
+            snippets = Snippet.objects.all()
+            serializer = SnippetSerializer(snippets, many=True)
+            return JsonResponse(serializer.data, safe=False)
+
+        elif request.method == 'POST':
+            data = JSONParser().parse(request)
+            serializer = SnippetSerializer(data=data)
+            if serializer.is_valid():
+                serializer.save()
+                return JsonResponse(serializer.data, status=201)
+            return JsonResponse(serializer.errors, status=400)
+
+
+    @csrf_exempt
+    def snippet_detail(request, pk):
+        """
+        Retrieve, update or delete a code snippet.
+        """
+        try:
+            snippet = Snippet.objects.get(pk=pk)
+        except Snippet.DoesNotExist:
+            return HttpResponse(status=404)
+
+        if request.method == 'GET':
+            serializer = SnippetSerializer(snippet)
+            return JsonResponse(serializer.data)
+
+        elif request.method == 'PUT':
+            data = JSONParser().parse(request)
+            serializer = SnippetSerializer(snippet, data=data)
+            if serializer.is_valid():
+                serializer.save()
+                return JsonResponse(serializer.data)
+            return JsonResponse(serializer.errors, status=400)
+
+        elif request.method == 'DELETE':
+            snippet.delete()
+            return HttpResponse(status=204)
+    ==================
+$$$$$ CREATE MMjango/snippets/urls.py
+    ==================
+    from django.urls import path
+    from MMjango.snippets import views
+
+    urlpatterns = [
+        path('snippets/', views.snippet_list),
+        path('snippets/<int:pk>/', views.snippet_detail),
+    ]
+    ==================
+$$$$$ EDIT MMjango/urls.py : EDIT
+    ==================
+    from django.contrib import admin
+    from django.urls import path
+
+    urlpatterns = [
+        path('admin/', admin.site.urls),
+    ]
+    ==================
+    from django.contrib import admin
+    from django.urls import path,include
+
+    urlpatterns = [
+        path('admin/', admin.site.urls),
+        path('', include('snippets.urls')),
+    ]
+    ==================
+(jango) nova@raspberry:~/WorkSpace/MMjango$ sudo systemctl restart gunicorn.service
