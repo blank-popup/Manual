@@ -1,0 +1,9 @@
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash
+wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash
+
+nvm install --lts
+nvm install 18.12.0
+nvm install 18
+
+nvm list
+nvm use 18.12.0
