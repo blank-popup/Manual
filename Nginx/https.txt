@@ -1,0 +1,91 @@
+CREATE index.html
+dave@dave-VirtualBox:~$ mkdir www
+dave@dave-VirtualBox:~$ cd www/
+dave@dave-VirtualBox:~/www$ mkdir html
+dave@dave-VirtualBox:~/www$ cd html/
+dave@dave-VirtualBox:~/www/html$ vi index.html
+==================
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <title>Welcome to https nginx!</title>
+    </head>
+    <body>
+    <h1>Welcome to https nginx!</h1>
+    <p>HTTPS NGINX</p>
+    </body>
+    </html>
+==================
+
+
+
+CREATE key
+openssl genrsa -aes256 -out private.key 2048
+openssl rsa -in private.key -out cert.key
+openssl req -new -key cert.key -out cert.csr
+openssl x509 -req -days 365 -in cert.csr -signkey cert.key -out cert.crt
+
+==================
+dave@dave-VirtualBox:~/www/cert/nginx$ openssl genrsa -aes256 -out private.key 2048
+Generating RSA private key, 2048 bit long modulus (2 primes)
+......................................+++++
+.........+++++
+e is 65537 (0x010001)
+Enter pass phrase for private.key:
+Verifying - Enter pass phrase for private.key:
+dave@dave-VirtualBox:~/www/cert/nginx$ openssl rsa -in private.key -out cert.key
+Enter pass phrase for private.key:
+writing RSA key
+dave@dave-VirtualBox:~/www/cert/nginx$ openssl req -new -key cert.key -out cert.csr
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter '.', the field will be left blank.
+-----
+Country Name (2 letter code) [AU]:
+State or Province Name (full name) [Some-State]:
+Locality Name (eg, city) []:
+Organization Name (eg, company) [Internet Widgits Pty Ltd]:
+Organizational Unit Name (eg, section) []:
+Common Name (e.g. server FQDN or YOUR name) []:
+Email Address []:
+
+Please enter the following 'extra' attributes
+to be sent with your certificate request
+A challenge password []:
+An optional company name []:
+dave@dave-VirtualBox:~/www/cert/nginx$ openssl x509 -req -days 365 -in cert.csr -signkey cert.key -out cert.crt
+Signature ok
+subject=C = AU, ST = Some-State, O = Internet Widgits Pty Ltd
+Getting Private key==================
+
+
+NGINX
+sudo apt install nginx
+
+
+CONFIGURE nginx
+CREATE /etc/nginx/sites-available/https
+==================
+    server {
+        listen                  443 ssl;
+        server_name             _;
+        ssl_certificate         /home/dave/www/cert/nginx/cert.crt;
+        ssl_certificate_key     /home/dave/www/cert/nginx/cert.key;
+        ssl_session_cache       shared:SSL:1m;
+        ssl_session_timeout     5m;
+
+        ssl_ciphers HIGH:!aNULL:!MD5;
+        ssl_prefer_server_ciphers    on;
+
+        location / {
+            root        /home/dave/www/html;
+            index       index.html index.htm;
+        }
+    }
+==================
+SYMBOLIC LINK
+ln -s /etc/nginx/sites-available/https /etc/nginx/sites-enabled/https
+dave@dave-VirtualBox:~/www$ sudo ln -s /etc/nginx/sites-available/https /etc/nginx/sites-enabled/https
