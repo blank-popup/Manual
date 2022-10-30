@@ -1,0 +1,3 @@
+sudo docker pull kurento/kurento-media-server
+sudo docker run -d --name kms --network host \
+    kurento/kurento-media-server
