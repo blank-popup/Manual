@@ -1,0 +1,64 @@
+git clone https://github.com/rghale/webrtc-screen-share.git
+cd webrtc-screen-share/
+npm install
+
+
+==================
+dave@dave-VirtualBox:~/www$ git clone https://github.com/rghale/webrtc-screen-share.git
+Cloning into 'webrtc-screen-share'...
+remote: Enumerating objects: 31, done.
+remote: Counting objects: 100% (31/31), done.
+remote: Compressing objects: 100% (26/26), done.
+remote: Total 31 (delta 4), reused 31 (delta 4), pack-reused 0
+Unpacking objects: 100% (31/31), 76.70 KiB | 462.00 KiB/s, done.
+dave@dave-VirtualBox:~/www$ cd webrtc-screen-share/
+dave@dave-VirtualBox:~/www/webrtc-screen-share$ npm install
+npm WARN old lockfile
+npm WARN old lockfile The package-lock.json file was created with an old version of npm,
+npm WARN old lockfile so supplemental metadata must be fetched from the registry.
+npm WARN old lockfile
+npm WARN old lockfile This is a one-time fix-up, please be patient...
+npm WARN old lockfile
+
+added 99 packages, and audited 100 packages in 31s
+
+9 vulnerabilities (7 high, 2 critical)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+Some issues need review, and may require choosing
+a different dependency.
+
+Run `npm audit` for details.
+==================
+
+
+Nginx -> node
+cert.key -> private.pem
+cert.crt -> public.pem
+
+openssl rsa -in server.key -text > private.pem
+openssl x509 -inform PEM -in server.crt > public.pem
+
+==================
+dave@dave-VirtualBox:/$ openssl rsa -in /home/dave/www/cert/nginx/cert.key -text > /home/dave/www/cert/node/private.pem
+writing RSA key
+dave@dave-VirtualBox:/$ openssl x509 -inform PEM -in /home/dave/www/cert/nginx/cert.crt > /home/dave/www/cert/node/public.pem
+==================
+
+
+EDIT /home/dave/www/webrtc-screen-share/server.js
+==================
+    key: fs.readFileSync('./certs/key.pem'),
+    cert: fs.readFileSync('./certs/cert.pem'),
+    passphrase: 'your certificate passphrase'
+==================
+    key: fs.readFileSync('/home/dave/www/cert/node/private.pem'),
+    cert: fs.readFileSync('/home/dave/www/cert/node/public.pem'),
+    passphrase: 'ItIsAwesome'
+==================
+
+npm install pm2 -g
+
+pm2 start server.js
