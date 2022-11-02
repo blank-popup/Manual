@@ -62,3 +62,35 @@ EDIT /home/dave/www/webrtc-screen-share/server.js
 npm install pm2 -g
 
 pm2 start server.js
+
+
+You can get adapters.js
+==================
+git clone https://github.com/webrtcHacks/adapter.git
+
+There is file : release/adapter.js
+
+or
+
+https://webrtc.github.io/adapter/adapter-latest.js
+rename adapter-latest.js to adapter.js
+==================
+
+You can get kurento-client.js
+==================
+git clone https://github.com/Kurento/kurento-client-bower.git
+
+There is file : kurento-client.js
+==================
+
+You can get kurento-utils.js
+==================
+git clone https://github.com/Kurento/kurento-utils-js
+cd kurento-utils-js
+npm install
+node_modules\.bin\grunt
+
+Directories(dist and doc) is created and ziped in kurento-utils-grunt.zip
+There is file : dist\kurento-utils.js
+
+==================
