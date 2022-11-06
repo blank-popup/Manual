@@ -1,0 +1,18 @@
+{
+    "logger": {
+        "level": "trace"
+    },
+    "stream": {
+        "file": [
+            {
+                "level": "trace",
+                "filename": "/log/basic-%DATE%.log"
+            }
+        ],
+        "console": [
+            {
+                "level": "trace"
+            }
+        ]
+    }
+}
