@@ -1,0 +1,19 @@
+{
+    "level": "silly",
+    "transports_file": [
+        {
+            "level": "silly",
+            "filename": "/log/basic-%DATE%.log",
+            "datePattern": "YYYY-MM-DD",
+            "maxFiles": "7d",
+            "zippedArchive": true,
+            "handleExceptions": true
+        }
+    ],
+    "transports_console": [
+        {
+            "level": "silly",
+            "handleExceptions": true
+        }
+    ]
+}
