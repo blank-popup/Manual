@@ -2,12 +2,11 @@ const { format, createLogger, transports } = require('winston');
 const { combine, timestamp, label, json, printf } = format;
 require('winston-daily-rotate-file');
 const path = require('path');
-const ROOT_PROJECT = path.join(__dirname);
-
 const fs = require('fs');
-let config = JSON.parse(fs.readFileSync('./mmLogit.json'));
 
-const mmFormat = printf(({ level, message, timestamp }) => {
+let config = JSON.parse(fs.readFileSync(__dirname + '/mmLogit.json'));
+
+function getTimeString(timestamp) {
     let date = new Date(timestamp);
     let yyyy = date.getFullYear().toString();
     let mm = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -17,14 +16,18 @@ const mmFormat = printf(({ level, message, timestamp }) => {
     let second = date.getSeconds().toString().padStart(2, '0');
     let msecond = date.getMilliseconds().toString().padStart(3, '0');
 
-    return `${yyyy}-${mm}-${dd} ${hour}:${minute}:${second}.${msecond} [${level}] ${message}`;
+    return `${yyyy}-${mm}-${dd} ${hour}:${minute}:${second}.${msecond}`;
+}
+
+const mmFormat = printf(({ level, message, timestamp }) => {
+    return `${getTimeString(timestamp)} [${level}] ${message}`;
 });
 
 config.transports = [];
 let porters_file = config.transports_file;
 let porters_console = config.transports_console;
 for (let ii = 0; ii < porters_file.length; ++ ii) {
-    porters_file[ii].filename = ROOT_PROJECT + porters_file[ii].filename;
+    porters_file[ii].filename = __dirname + porters_file[ii].filename;
     config.transports.push(new transports.DailyRotateFile(porters_file[ii]));
 }
 for (let ii = 0; ii < porters_console.length; ++ ii) {
@@ -75,7 +78,7 @@ function formatLogArgs(args) {
     args = Array.prototype.slice.call(args);
     var stackInfo = getStackInfo(1);
     if (stackInfo) {
-        var callee = '(' + stackInfo.relativePath + ':' + stackInfo.line + ')';
+        var callee = '(' + stackInfo.file + ':' + stackInfo.line + ')';
         if (typeof args[0] === 'string') {
             args[0] = args[0] + ' ' + callee;
         } else {
@@ -96,7 +99,7 @@ function getStackInfo(stackIndex) {
     if (sp && sp.length === 5) {
         return {
             method: sp[1],
-            relativePath: path.relative(ROOT_PROJECT, sp[2]),
+            relativePath: path.relative(__dirname, sp[2]),
             line: sp[3],
             pos: sp[4],
             file: path.basename(sp[2]),
