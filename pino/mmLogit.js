@@ -72,7 +72,7 @@ const logger = traceCaller(pino({
     // base: { group: 'application', pid: process.pid, hostname: os.hostname() },
     base: undefined,
     // timestamp: () => `,"time": "${new Date(Date.now()).toISOString()}"`,
-    timestamp: () => `,"time": "${getTimeString(new Date().getTime())}"`,
+    timestamp: () => `,"time":"${getTimeString(new Date().getTime())}"`,
     formatters: {
         level: (label) => {
             return { level: label };
