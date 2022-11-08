@@ -1,0 +1,172 @@
+Create Root CA
+1. RSA key - remember password!! - ex) mm-root-ca
+openssl genrsa -aes256 -out mm-root-ca.key 2048
+
+
+2. vi mm-root-ca.conf
+==================
+[ req ]
+default_bits            = 2048
+default_md              = sha1
+default_keyfile         = mm-root-ca.key
+distinguished_name      = req_distinguished_name
+extensions              = v3_ca
+req_extensions          = v3_ca
+
+[ v3_ca ]
+basicConstraints       = critical, CA:TRUE, pathlen:0
+subjectKeyIdentifier   = hash
+##authorityKeyIdentifier = keyid:always, issuer:always
+keyUsage               = keyCertSign, cRLSign
+nsCertType             = sslCA, emailCA, objCA
+
+[req_distinguished_name ]
+countryName                     = Country Name (2 letter code)
+countryName_default             = AU
+countryName_min                 = 2
+countryName_max                 = 2
+
+organizationName                = Organization Name (eg, company)
+organizationName_default        = Mike and Mary
+
+#organizationalUnitName         = Organizational Unit Name (eg, section)
+#organizationalUnitName_default = CA Project
+
+commonName                      = Common Name (eg, your name or your server's hostname)
+commonName_default              = MM Self Signed CA
+commonName_max                  = 64
+==================
+
+
+3. CSR - input password for root ca - enter default value set in mm-root-ca.conf
+openssl req -new -key mm-root-ca.key -out mm-root-ca.csr -config mm-root-ca.conf
+
+
+4. Self Signed Certificate - input password for root ca
+openssl x509 -req \
+-days 3650 \
+-extensions v3_ca \
+-set_serial 1 \
+-in mm-root-ca.csr \
+-signkey mm-root-ca.key \
+-out mm-root-ca.crt \
+-extfile mm-root-ca.conf
+
+
+5. Check Root CA
+openssl x509 -text -in mm-root-ca.crt
+
+
+mm-root-ca.key : Root CA private key
+mm-root-ca.crt : Root CA public key
+
+
+
+Issue a Certificate
+1. RSA Private Key - remember password!! - ex) mm-ssl
+openssl genrsa -aes256 -out 192.168.200.134.key 2048
+
+
+2. Remove password from Key - input password for ssl
+mv 192.168.200.134.key 192.168.200.134.key.enc
+openssl rsa -in 192.168.200.134.key.enc -out 192.168.200.134.key
+
+
+3. vi 192.168.200.134.conf
+==================
+[ req ]
+default_bits            = 2048
+default_md              = sha1
+default_keyfile         = mm-root-ca.key
+distinguished_name      = req_distinguished_name
+extensions              = v3_user
+##req_extensions          = v3_user
+
+[ v3_user ]
+basicConstraints = CA:FALSE
+authorityKeyIdentifier  = keyid,issuer
+subjectKeyIdentifier    = hash
+keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+
+extendedKeyUsage        = serverAuth,clientAuth
+subjectAltName          = @alt_names
+
+[ alt_names]
+##DNS.1                   = www.mm.com
+##DNS.2                   = mm.com
+##DNS.3                   = *.mm.com
+IP.1                    = 192.168.200.134
+##IP.2                    = 127.0.0.1
+
+[req_distinguished_name ]
+countryName                    = Country Name (2 letter code)
+countryName_default            = US
+countryName_min                = 2
+countryName_max                = 2
+
+organizationName               = Organization Name (eg, company)
+organizationName_default       = Mike and Mary
+
+organizationalUnitName         = Organizational Unit Name (eg, section)
+organizationalUnitName_default = MM SSL Project
+
+commonName                     = Common Name (eg, your name or your server's hostname)
+commonName_default             = We are Mike and Mary
+commonName_max                 = 64
+==================
+
+
+4. CSR - enter default value set in 192.168.200.134.conf
+openssl req -new -key 192.168.200.134.key -out 192.168.200.134.csr -config 192.168.200.134.conf
+
+
+5. SSL Certificate for 192.168.200.134 - input password for root ca
+openssl x509 -req -days 1825 -extensions v3_user -in 192.168.200.134.csr \
+-CA mm-root-ca.crt -CAcreateserial \
+-CAkey  mm-root-ca.key \
+-out 192.168.200.134.crt -extfile 192.168.200.134.conf
+
+
+6. Check SSL Certificate
+openssl x509 -text -in 192.168.200.134.crt
+
+
+7. Check CSR
+openssl req -text -in 192.168.200.134.csr
+
+
+Configure Nginx
+1. sudo vi /etc/nginx/sites-available/https
+==================
+server {
+    listen                  443 ssl;
+    server_name             _;
+    ssl_certificate         /home/dave/www/ca/192.168.200.134.crt;
+    ssl_certificate_key     /home/dave/www/ca/192.168.200.134.key;
+    ssl_session_cache       shared:SSL:1m;
+    ssl_session_timeout     5m;
+
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    ssl_prefer_server_ciphers    on;
+
+    location / {
+        root        /home/dave/www/ca;
+        index       index.html index.htm;
+    }
+}
+==================
+
+2. Symbolic link
+ln -s /etc/nginx/sites-available/https /etc/nginx/sites-enabled/https
+
+
+
+nginx -> nodejs
+openssl rsa -in 192.168.200.134.key -text > private.pem
+openssl x509 -inform PEM -in 192.168.200.134.crt > public.pem
+
+const server = https.createServer({
+    key: fs.readFileSync('/home/dave/www/ca/private.pem'),
+    cert: fs.readFileSync('/home/dave/www/ca/public.pem'),
+    passphrase: 'mm-ssl'
+}, app);
