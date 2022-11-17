@@ -20,7 +20,7 @@ subjectKeyIdentifier   = hash
 keyUsage               = keyCertSign, cRLSign
 nsCertType             = sslCA, emailCA, objCA
 
-[req_distinguished_name ]
+[ req_distinguished_name ]
 countryName                     = Country Name (2 letter code)
 countryName_default             = AU
 countryName_min                 = 2
@@ -64,15 +64,15 @@ mm-root-ca.crt : Root CA public key
 
 Issue a Certificate
 1. RSA Private Key - remember password!! - ex) mm-ssl
-openssl genrsa -aes256 -out 192.168.200.134.key 2048
+openssl genrsa -aes256 -out 192.168.200.121.key 2048
 
 
 2. Remove password from Key - input password for ssl
-mv 192.168.200.134.key 192.168.200.134.key.enc
-openssl rsa -in 192.168.200.134.key.enc -out 192.168.200.134.key
+mv 192.168.200.121.key 192.168.200.121.key.enc
+openssl rsa -in 192.168.200.121.key.enc -out 192.168.200.121.key
 
 
-3. vi 192.168.200.134.conf
+3. vi 192.168.200.121.conf
 ==================
 [ req ]
 default_bits            = 2048
@@ -91,14 +91,14 @@ keyUsage = nonRepudiation, digitalSignature, keyEncipherment
 extendedKeyUsage        = serverAuth,clientAuth
 subjectAltName          = @alt_names
 
-[ alt_names]
+[ alt_names ]
 ##DNS.1                   = www.mm.com
 ##DNS.2                   = mm.com
 ##DNS.3                   = *.mm.com
-IP.1                    = 192.168.200.134
-##IP.2                    = 127.0.0.1
+IP.1                    = 192.168.200.121
+IP.2                    = 127.0.0.1
 
-[req_distinguished_name ]
+[ req_distinguished_name ]
 countryName                    = Country Name (2 letter code)
 countryName_default            = US
 countryName_min                = 2
@@ -116,23 +116,23 @@ commonName_max                 = 64
 ==================
 
 
-4. CSR - enter default value set in 192.168.200.134.conf
-openssl req -new -key 192.168.200.134.key -out 192.168.200.134.csr -config 192.168.200.134.conf
+4. CSR - enter default value set in 192.168.200.121.conf
+openssl req -new -key 192.168.200.121.key -out 192.168.200.121.csr -config 192.168.200.121.conf
 
 
-5. SSL Certificate for 192.168.200.134 - input password for root ca
-openssl x509 -req -days 1825 -extensions v3_user -in 192.168.200.134.csr \
+5. SSL Certificate for 192.168.200.121 - input password for root ca
+openssl x509 -req -days 1825 -extensions v3_user -in 192.168.200.121.csr \
 -CA mm-root-ca.crt -CAcreateserial \
 -CAkey  mm-root-ca.key \
--out 192.168.200.134.crt -extfile 192.168.200.134.conf
+-out 192.168.200.121.crt -extfile 192.168.200.121.conf
 
 
 6. Check SSL Certificate
-openssl x509 -text -in 192.168.200.134.crt
+openssl x509 -text -in 192.168.200.121.crt
 
 
 7. Check CSR
-openssl req -text -in 192.168.200.134.csr
+openssl req -text -in 192.168.200.121.csr
 
 
 Configure Nginx
@@ -156,14 +156,14 @@ server {
 }
 ==================
 
+
 2. Symbolic link
 ln -s /etc/nginx/sites-available/https /etc/nginx/sites-enabled/https
 
 
-
-nginx -> nodejs
-openssl rsa -in 192.168.200.134.key -text > private.pem
-openssl x509 -inform PEM -in 192.168.200.134.crt > public.pem
+3. nginx -> nodejs
+openssl rsa -in 192.168.200.121.key -text > private.pem
+openssl x509 -inform PEM -in 192.168.200.121.crt > public.pem
 
 const server = https.createServer({
     key: fs.readFileSync('/home/dave/www/ca/private.pem'),
