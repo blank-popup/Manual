@@ -55,7 +55,7 @@ echo | tee -a $2.conf
 echo "organizationalUnitName         = Organizational Unit Name (eg, section)" | tee -a $2.conf
 echo "organizationalUnitName_default = MM SSL Project" | tee -a $2.conf
 echo | tee -a $2.conf
-echo "commonName                     = Common Name (eg, your name or your server\'s hostname)" | tee -a $2.conf
+echo "commonName                     = Common Name (eg, your name or your server's hostname)" | tee -a $2.conf
 echo "commonName_default             = We are Mike and Mary" | tee -a $2.conf
 echo "commonName_max                 = 64" | tee -a $2.conf
 
@@ -106,11 +106,11 @@ echo "ln -s /etc/nginx/sites-available/https /etc/nginx/sites-enabled/https"
 
 
 echo "3. nginx -> nodejs"
-echo "openssl rsa -in $2.key -text > private.pem"
-echo "openssl x509 -inform PEM -in $2.crt > public.pem"
+openssl rsa -in $2.key -text > private.pem
+openssl x509 -inform PEM -in $2.crt > public.pem
 
 echo "const server = https.createServer({"
-echo "    key: fs.readFileSync(\'/home/dave/www/ca/private.pem\'),"
-echo "    cert: fs.readFileSync(\'/home/dave/www/ca/public.pem\'),"
-echo "    passphrase: \'mm-ssl\'"
+echo "    key: fs.readFileSync('/home/dave/www/ca/private.pem'),"
+echo "    cert: fs.readFileSync('/home/dave/www/ca/public.pem'),"
+echo "    passphrase: 'mm-ssl'"
 echo "}, app);"

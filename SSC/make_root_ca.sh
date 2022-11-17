@@ -41,7 +41,7 @@ echo | tee -a $1.conf
 echo "#organizationalUnitName         = Organizational Unit Name (eg, section)" | tee -a $1.conf
 echo "#organizationalUnitName_default = CA Project" | tee -a $1.conf
 echo | tee -a $1.conf
-echo "commonName                      = Common Name (eg, your name or your server hostname)" | tee -a $1.conf
+echo "commonName                      = Common Name (eg, your name or your server's hostname)" | tee -a $1.conf
 echo "commonName_default              = MM Self Signed CA" | tee -a $1.conf
 echo "commonName_max                  = 64" | tee -a $1.conf
 
