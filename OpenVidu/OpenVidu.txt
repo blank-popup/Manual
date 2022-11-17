@@ -1,0 +1,44 @@
+sudo su
+cd /opt
+root@dave-VirtualBox:/opt# curl https://s3-eu-west-1.amazonaws.com/aws.openvidu.io/install_openvidu_latest.sh | bash
+root@dave-VirtualBox:/opt# cd openvidu
+root@dave-VirtualBox:/opt/openvidu# vi .env
+------------------
+# Domain name. If you do not have one, the public IP of the machine.
+# For example: 198.51.100.1, or openvidu.example.com
+DOMAIN_OR_PUBLIC_IP=
+------------------
+# Domain name. If you do not have one, the public IP of the machine.
+# For example: 198.51.100.1, or openvidu.example.com
+#DOMAIN_OR_PUBLIC_IP=
+DOMAIN_OR_PUBLIC_IP=192.168.200.121
+------------------
+
+------------------
+# OpenVidu SECRET used for apps to connect to OpenVidu server and users to access to OpenVidu Dashboard
+OPENVIDU_SECRET=
+------------------
+# OpenVidu SECRET used for apps to connect to OpenVidu server and users to access to OpenVidu Dashboard
+#OPENVIDU_SECRET=
+OPENVIDU_SECRET=davevidu
+------------------
+
+------------------
+# Whether to enable recording module or not
+OPENVIDU_RECORDING=false
+------------------
+# Whether to enable recording module or not
+#OPENVIDU_RECORDING=false
+OPENVIDU_RECORDING=true
+------------------
+
+root@dave-VirtualBox:/opt/openvidu# ./openvidu start
+
+
+root@dave-VirtualBox:/opt/openvidu# mv /opt/openvidu/certificates/live/192.168.200.121/fullchain.pem /opt/openvidu/certificates/live/192.168.200.121/__fullchain.pem
+root@dave-VirtualBox:/opt/openvidu# mv /opt/openvidu/certificates/live/192.168.200.121/privkey.pem /opt/openvidu/certificates/live/192.168.200.121/__privkey.pem
+
+root@dave-VirtualBox:/opt/openvidu# cp /home/dave/cert/public.pem /opt/openvidu/certificates/live/192.168.200.121/fullchain.pem
+root@dave-VirtualBox:/opt/openvidu# cp /home/dave/cert/private.pem /opt/openvidu/certificates/live/192.168.200.121/privkey.pem
+
+root@dave-VirtualBox:/opt/openvidu# ./openvidu restart
